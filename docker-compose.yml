@@ -1,0 +1,40 @@
+version: '3.1'
+
+services:
+  n8n:
+    image: bloodyburger/n8n-python:latest
+    restart: always
+    container_name: n8n
+    environment:
+ #     - DB_TYPE=postgresdb
+ #     - DB_POSTGRESDB_HOST=n8n_postgres
+ #     - DB_POSTGRESDB_PORT=5432
+ #     - DB_POSTGRESDB_DATABASE=${POSTGRES_DB}
+ #     - DB_POSTGRESDB_USER=${POSTGRES_NON_ROOT_USER}
+ #     - DB_POSTGRESDB_PASSWORD=${POSTGRES_NON_ROOT_PASSWORD}
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER
+      - N8N_BASIC_AUTH_PASSWORD
+      - N8N_PROTOCOL=https
+      - N8N_PUSH_BACKEND=websocket
+      - N8N_EDITOR_BASE_URL=https://<Domain>
+      - WEBHOOK_URL
+      - VUE_APP_URL_BASE_API
+      - N8N_HOST
+      - EXECUTIONS_DATA_PRUNE=true
+      - EXECUTIONS_DATA_PRUNE_MAX_COUNT=10000
+      - EXECUTIONS_DATA_MAX_AGE=168
+      - N8N_EMAIL_MODE=smtp
+      - N8N_SMTP_HOST=<HOST>
+      - N8N_SMTP_PORT=465
+      - N8N_SMTP_USER=<USER>
+      - N8N_SMTP_PASS=<PASSWORD>
+      - N8N_SMTP_SENDER=<FROM_EMAIL>
+    ports:
+      - 127.0.0.1:5678:5678
+    volumes:
+      - /opt/n8n/home:/home/node/.n8n
+      - ./py_scripts:/data/py_scripts
+    # Wait 5 seconds to start n8n to make sure that PostgreSQL is ready
+    # when n8n tries to connect to it
+    command: "start --tunnel"
